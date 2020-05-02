@@ -120,8 +120,8 @@ if __name__ == "__main__":
 }
 ```
 
- ``` **注意** 本教程假定您要对7.0.0之前的Elasticsearch版本进行基准测试。如果要对Elasticsearch 7.0.0或更高版本进行基准测试，则需要删除上面的映射类型。
- ```
+ > **注意** 本教程假定您要对7.0.0之前的Elasticsearch版本进行基准测试。如果要对Elasticsearch 7.0.0或更高版本进行基准测试，则需要删除上面的映射类型。
+ 
 
 
 有关es的语法的详细信息，请参阅有关[映射](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)的Elasticsearch文档和[create index API](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html)  
@@ -202,12 +202,12 @@ if __name__ == "__main__":
 
 其中文档数可以通过`wc -l documents.json`获取，文档未压缩大小可以通过`ll`获取。
 
-``` **注意** 本教程假定您要对7.0.0之前的Elasticsearch版本进行基准测试。如果要对Elasticsearch 7.0.0或更高版本进行基准测试，则需要删除上面的types属性。
-```
-``` **注意** 您可以将任何支持的脚本与track一起存储。但是，您需要将它们放置在以“ _”开头的目录中，例如“_support”。 Rally从任何目录加载跟踪插件（请参阅下文），但将忽略以“_”开头的目录。
-```
-``` **注意**  我们为轨道定义了JSON模式，您可以使用它检查如何定义track。您还应该检查Rally提供的track以获取灵感。
-```
+> **注意** 本教程假定您要对7.0.0之前的Elasticsearch版本进行基准测试。如果要对Elasticsearch 7.0.0或更高版本进行基准测试，则需要删除上面的types属性。
+
+> **注意** 您可以将任何支持的脚本与track一起存储。但是，您需要将它们放置在以“ _”开头的目录中，例如“_support”。 Rally从任何目录加载跟踪插件（请参阅下文），但将忽略以“_”开头的目录。
+
+> **注意**  我们为轨道定义了JSON模式，您可以使用它检查如何定义track。您还应该检查Rally提供的track以获取灵感。
+
 当你运行`esrally list tracks --track-path=~/rally-tracks/tutorial`的时候，一条新的track就会出现：
 ```
 dm@io:~ $ esrally list tracks --track-path=~/rally-tracks/tutorial
