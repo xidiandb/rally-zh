@@ -206,7 +206,7 @@ if __name__ == "__main__":
 ```
 ``` **注意** 您可以将任何支持的脚本与track一起存储。但是，您需要将它们放置在以“ _”开头的目录中，例如“_support”。 Rally从任何目录加载跟踪插件（请参阅下文），但将忽略以“_”开头的目录。
 ```
-``` **注意** 我们为轨道定义了JSON模式，您可以使用它检查如何定义track。您还应该检查Rally提供的track以获取灵感。
+``` **注意**  我们为轨道定义了JSON模式，您可以使用它检查如何定义track。您还应该检查Rally提供的track以获取灵感。
 ```
 当你运行`esrally list tracks --track-path=~/rally-tracks/tutorial`的时候，一条新的track就会出现：
 ```
