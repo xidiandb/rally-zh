@@ -75,45 +75,36 @@ esrally --track=pmc --target-hosts=10.5.5.10:9243,10.5.5.11:9243,10.5.5.12:9243 
 
 ### Elasticsearch template优化项
 1. Translog flush间隔调整
-"index.translog.sync_interval":"60s",
-"index.translog.durability":"async"
-设置async表示tarnslog的刷盘策略按照sync_interval配置的时间周期进行。
-"index.translog.flush_threshold_size":"1024mb",
-设置flush_threshold_size表示translog达到1024mb的时候进行刷盘
+`"index.translog.sync_interval":"60s"``"index.translog.durability":"async"`设置async表示tarnslog的刷盘策略按照sync_interval配置的时间周期进行。`"index.translog.flush_threshold_size":"1024mb"`设置`flush_threshold_size`表示translog达到1024mb的时候进行刷盘
 
 2. 索引刷新间隔
-"index.refresh_interval":"60s",
-
-默认情况下索引的refresh_interval的时间为1s，这意味着数据写入1s后就可以被搜索到，每次refresh会产生一个新的Lucene段，这会导致segment merge的行为，如果不需要这么高的搜索实时性可以降低索引refresh的周期
+`"index.refresh_interval":"60s"`默认情况下索引的refresh_interval的时间为1s，这意味着数据写入1s后就可以被搜索到，每次refresh会产生一个新的Lucene段，这会导致segment merge的行为，如果不需要这么高的搜索实时性可以降低索引refresh的周期
 
 3. 段合并优化
-index.merge.scheduler.max_thread_count
-如果只有一块硬盘且非ssd的话上值应该设置为1
-index.merge.policy.segments_per_tier
-该属性指定了每层分段的数量,取值约小最终segment 越少,因此需要 merge 的操作更多,可以考虑适当增加此值.默认为10。
-index.merge.policy.max_merged_segment
-指定了单个segment的最大容量，默认为5G，可以适当降低此值
+`index.merge.scheduler.max_thread_count`如果只有一块硬盘且非ssd的话上值应该设置为1,`index.merge.policy.segments_per_tier`该属性指定了每层分段的数量,取值约小最终segment 越少,因此需要 merge 的操作更多,可以考虑适当增加此值.默认为10。
+`index.merge.policy.max_merged_segment`指定了单个segment的最大容量，默认为5G，可以适当降低此值
 
 4. Indexing Buffer
-indices.memory.index_buffer_size
-indexing buffer在为 doc 建立索引时使用,当缓冲满时会刷入磁盘,生成一个新的 segment, 这是除refresh_interval外另外一个刷新索引,生成新 segment 的情况. 每个shard有自己的indexing buffer，默认为整个堆空间的10%。可以考虑适当增加该值。
+`indices.memory.index_buffer_size`indexing buffer在为 doc 建立索引时使用,当缓冲满时会刷入磁盘,生成一个新的 segment, 这是除refresh_interval外另外一个刷新索引,生成新 segment 的情况. 每个shard有自己的indexing buffer，默认为整个堆空间的10%。可以考虑适当增加该值。
 
 建议的配置
+```json
 settings : {
-	“index.merge.policy.max_merged_segment”:”2gb”,
-	“index.merge.policy.segments_per_tier”:”24”,
-	“index.optimize_auto_generated_id”:”true”,
+	"index.merge.policy.max_merged_segment":"2gb",
+	"index.merge.policy.segments_per_tier":"24",
+	"index.optimize_auto_generated_id":"true",
 	"index.translog.flush_threshold_size":"1024mb",
 	"index.translog.durability":"async",
 	"index.translog.sync_interval":"60s",
 	"index.refresh_interval":"60s"
 }
-
-```note:: 
+```
+```
 indices.memory.index_buffer_size : 30%
 index.merge.scheduler.max_thread_count: 1
-这两项配置是在elasticsearch.yml中配置。
 ```
+这两项配置是在elasticsearch.yml中配置。
+
 
 ## track.json的配置
  track.json规定了测试的一些行为如下：
