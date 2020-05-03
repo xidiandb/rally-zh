@@ -4,10 +4,12 @@
    contain the root `toctree` directive.
 
 esrally中文文档
-====================================
+=================
 
-想对生产上的es集群进行一次压测，找了好多资料，发现esrally是一个不错的选择，但是一顿搜索只找到了官方文档的英文版，很多人呼吁中文版文档的出现，现在它来了！刚刚开始，希望有人可以fork我的项目，一起完成这个翻译的任务。
-esrally中把es的测试描述成了一次拉力赛，即rally，翻译的时候尽量保持原汁原味，所以这些专用的名词我就不翻译了，敬请见谅。track就是赛道，race就是比赛，challenge即为挑战。
+有人想看esrally中文文档，今天他来了！
+
+.. important::
+    本文档基于esrally的版本为1.4.1
 
 
 .. toctree::
@@ -16,6 +18,11 @@ esrally中把es的测试描述成了一次拉力赛，即rally，翻译的时候
 
    quickstart
    install
+   docker
+   configuration
+   benchmark
+   tournament
+   tips
 
 .. toctree::
    :maxdepth: 2
@@ -23,3 +30,8 @@ esrally中把es的测试描述成了一次拉力赛，即rally，翻译的时候
 
    add_tracks
 
+.. toctree::
+   :maxdepth: 2
+   :caption: 参考:
+
+   esversion

@@ -5,11 +5,11 @@ Rally是为Unix开发的，并已在Linux和MacOS上进行了很多测试。 Ral
 ## 下载安装
 
 安装Python 3.5+（包括pip3，git 1.9+）和对应的JDK以运行Elasticsearch。确保JAVA_HOME指向该JDK。然后运行以下命令，如有必要，可以使用sudo作为前缀：  
-`pip3 install esrally`
+```pip3 install esrally```
 如果您有任何麻烦或需要更详细的说明，请参阅详细的安装指南。
 
 ## 配置
-第一次运行rally的时候需要进行配置，如果使用默认配置	的话直接执行 `esrally configure`。
+第一次运行rally的时候需要进行配置，如果使用默认配置的话直接执行 `esrally configure`。
 
 有关更多详细说明，请参阅配置指南。
 
@@ -108,4 +108,4 @@ esrally --distribution-version=6.5.3
 ```
 
 ## 下一步
-现在，您可以检查如何运行基准测试，更好地了解如何解释测试报告中的数字或[开始创建自己的track](./add_tracks.md)。请务必检查一些提示和技巧，以帮助您了解如何解决Rally中的特定问题。
+现在，您可以检查如何运行基准测试，更好地了解如何解释测试报告中的指标或[创建自己的track](add_tracks.md)。你也可以看一下提示和技巧，以帮助您了解如何解决Rally中的特定问题。
