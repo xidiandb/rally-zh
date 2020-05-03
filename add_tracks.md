@@ -41,7 +41,7 @@ tracks/acme/track.json
 
 首先获取数据，[Geonames](http://www.geonames.org/)根据[creative commons license](http://creativecommons.org/licenses/by/3.0/)许可提供地理数据。下载[allCountries.zip](http://download.geonames.org/export/dump/allCountries.zip)（大约300MB），解压缩并检查`allCountries.txt`。
 该文件以制表符分隔，但要使用Elasticsearch批量索引数据，我们需要JSON格式的数据。使用以下脚本转换数据：
-```
+```python
 import json
 
 cols = (("geonameid", "int", True),
@@ -258,13 +258,33 @@ Schedule:
 恭喜，您已经创建了第一条track！你可以用`esrally --distribution-version=6.0.0 --track-path=~/rally-tracks/tutorial`测试es集群了。
 
 
+## 增加测试数据
 
+这里提供的数据数量很有限，下面的脚本可以快速增加数据量：
+```python
+import json,random
 
+from tqdm import tqdm
 
+MAX_NUM=10000000*3
 
+def create_data():
+  num = MAX_NUM
+  for i in tqdm(range(num)):
+    geonameid = random.randint(1,100)
+    latitude = random.uniform(10,20)
+    name = random.sample('zyxwvutsrqponmlkjihgfedcba',5)
+    name = ''.join(name)
+    longitude = random.uniform(20,30)
+    population = random.randint(1,10000)
+    data = {"geonameid":geonameid,"latitude":latitude,"name":name,"longitude":longitude,"population":population}
+    print(json.dumps(data, ensure_ascii=False))
 
+if __name__ == "__main__":
+    create_data()
+```
 
-
+将其保存为`createJson.py`执行 `python3 createJson.py >> documents.json` 通过配置`MAX_NUM`的值，每10000000的大小为1.2G的数据。
 
 
 

@@ -36,3 +36,169 @@ esrally --track=pmc --target-hosts=10.5.5.10:9200,10.5.5.11:9200,10.5.5.12:9200 
 ```
 esrally --track=pmc --target-hosts=10.5.5.10:9243,10.5.5.11:9243,10.5.5.12:9243 --pipeline=benchmark-only --client-options="use_ssl:true,verify_certs:true,basic_auth_user:'elastic',basic_auth_password:'changeme'"
 ```
+
+## index.json的配置
+
+```json
+{
+  "settings": {
+    "index.number_of_replicas": 0
+  },
+  "mappings": {
+    "docs": {
+      "dynamic": "strict",
+      "properties": {
+        "geonameid": {
+          "type": "long"
+        },
+        "name": {
+          "type": "text"
+        },
+        "latitude": {
+          "type": "double"
+        },
+        "longitude": {
+          "type": "double"
+        },
+        "country_code": {
+          "type": "text"
+        },
+        "population": {
+          "type": "long"
+        }
+      }
+    }
+  }
+}
+```
+其中 `settings`其实就对应了es中templates的配置可以通过修改这里，对templates的优化进行测试，优化总结如下：
+
+### Elasticsearch template优化项
+1. Translog flush间隔调整
+"index.translog.sync_interval":"60s",
+"index.translog.durability":"async"
+设置async表示tarnslog的刷盘策略按照sync_interval配置的时间周期进行。
+"index.translog.flush_threshold_size":"1024mb",
+设置flush_threshold_size表示translog达到1024mb的时候进行刷盘
+
+2. 索引刷新间隔
+"index.refresh_interval":"60s",
+
+默认情况下索引的refresh_interval的时间为1s，这意味着数据写入1s后就可以被搜索到，每次refresh会产生一个新的Lucene段，这会导致segment merge的行为，如果不需要这么高的搜索实时性可以降低索引refresh的周期
+
+3. 段合并优化
+index.merge.scheduler.max_thread_count
+如果只有一块硬盘且非ssd的话上值应该设置为1
+index.merge.policy.segments_per_tier
+该属性指定了每层分段的数量,取值约小最终segment 越少,因此需要 merge 的操作更多,可以考虑适当增加此值.默认为10。
+index.merge.policy.max_merged_segment
+指定了单个segment的最大容量，默认为5G，可以适当降低此值
+
+4. Indexing Buffer
+indices.memory.index_buffer_size
+indexing buffer在为 doc 建立索引时使用,当缓冲满时会刷入磁盘,生成一个新的 segment, 这是除refresh_interval外另外一个刷新索引,生成新 segment 的情况. 每个shard有自己的indexing buffer，默认为整个堆空间的10%。可以考虑适当增加该值。
+
+建议的配置
+settings : {
+	“index.merge.policy.max_merged_segment”:”2gb”,
+	“index.merge.policy.segments_per_tier”:”24”,
+	“index.optimize_auto_generated_id”:”true”,
+	"index.translog.flush_threshold_size":"1024mb",
+	"index.translog.durability":"async",
+	"index.translog.sync_interval":"60s",
+	"index.refresh_interval":"60s"
+}
+
+```note:: 
+indices.memory.index_buffer_size : 30%
+index.merge.scheduler.max_thread_count: 1
+这两项配置是在elasticsearch.yml中配置。
+```
+
+## track.json的配置
+ track.json规定了测试的一些行为如下：
+```json
+{
+  "version": 2,
+  "description": "Tutorial benchmark for Rally",
+  "indices": [
+    {
+      "name": "geonames",
+      "body": "index.json",
+      "types": [ "docs" ]
+    }
+  ],
+  "corpora": [
+    {
+      "name": "rally-tutorial",
+      "documents": [
+        {
+          "source-file": "documents.json",
+          "document-count": 11658903,
+          "uncompressed-bytes": 1544799789
+        }
+      ]
+    }
+  ],
+  "schedule": [
+    {
+      "operation": {
+        "operation-type": "delete-index"
+      }
+    },
+    {
+      "operation": {
+        "operation-type": "create-index"
+      }
+    },
+    {
+      "operation": {
+        "operation-type": "cluster-health",
+        "request-params": {
+          "wait_for_status": "green"
+        }
+      }
+    },
+    {
+      "operation": {
+        "operation-type": "bulk",
+        "bulk-size": 5000
+      },
+      "warmup-time-period": 120,
+      "clients": 8
+    },
+    {
+      "operation": {
+        "operation-type": "force-merge"
+      }
+    },
+    {
+      "operation": {
+        "name": "query-match-all",
+        "operation-type": "search",
+        "body": {
+          "query": {
+            "match_all": {}
+          }
+        }
+      },
+      "clients": 8,
+      "warmup-iterations": 1000,
+      "iterations": 1000,
+      "target-throughput": 100
+    }
+  ]
+}
+```
+其中我最关心es的写入性能，所以下面的测试着重测试es的写入：
+```json
+{
+  "operation": {
+    "operation-type": "bulk",
+    "bulk-size": 5000
+  },
+  "warmup-time-period": 120,
+  "clients": 8
+}
+```
+这里的几个值我们简单介绍一下，bulk不用多提，就是es的批量操作，bulk-size的值就是一次请求写入的数据条数，warmup-time-period是热身时间，意思就是让es把cpu和内存都调度起来，机器热了才开始测试，clients就是模拟客户端的数量。这个地方如果数据盘是机械盘的话，这个数字太大的话请求生成可能成为瓶颈。
