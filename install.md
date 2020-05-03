@@ -59,5 +59,5 @@ sudo apt-get install git
 sudo yum install git
 ```
 
-``` 注意:: 如果使用RHEL，请通过Red Hat Software Collections安装最新版本的git。
+``` important:: 如果使用RHEL，请通过Red Hat Software Collections安装最新版本的git。
 ```
