@@ -13,11 +13,14 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-
+import sys
+import os
+import shlex
 
 # -- Project information -----------------------------------------------------
 import recommonmark
 from recommonmark.transform import AutoStructify
+sys.path.insert(0, os.path.abspath('..'))
 
 project = 'rally-zh'
 copyright = '2020, Borg Deng'
@@ -68,7 +71,8 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
-
+pygments_style = 'sphinx'
+todo_include_todos = False
 master_doc = 'index'
 def setup(app):
     app.add_config_value('recommonmark_config', {
